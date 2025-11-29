@@ -1,67 +1,55 @@
+require('dotenv').config();
 const mineflayer = require('mineflayer');
-const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
+const { pathfinder, Movements } = require('mineflayer-pathfinder');
 const mcDataLib = require('minecraft-data');
 const { thinker } = require('./aiClient');
-const executor = require('./executor');
-const rules = require('./rules');
-const fs = require('fs');
+const { executeAction } = require('./executor');
 
+function createBotInstance(name) {
+  const bot = mineflayer.createBot({
+    host: process.env.SERVER_HOST || 'localhost',
+    port: Number(process.env.SERVER_PORT) || 25565,
+    username: name
+  });
 
-function createBotInstance(username) {
-const bot = mineflayer.createBot({
-host: process.env.SERVER_HOST || 'localhost',
-port: parseInt(process.env.SERVER_PORT || '25565', 10),
-username
-});
+  bot.loadPlugin(pathfinder);
 
+  bot.once('spawn', () => {
+    const mcData = mcDataLib(bot.version);
+    bot.pathfinder.setMovements(new Movements(bot, mcData));
+    console.log(`🔥 ${name} is online at`, bot.entity.position);
+    bot.chat('Hello — I am alive.');
+    startAILoop(bot, name);
+  });
 
-bot.loadPlugin(pathfinder);
-
-
-bot.on('spawn', () => {
-const mcData = mcDataLib(bot.version);
-const defaultMove = new Movements(bot, mcData);
-bot.pathfinder.setMovements(defaultMove);
-bot.chat(`Hello, I am ${username}`);
-
-
-// main loop
-const interval = parseInt(process.env.DECISION_INTERVAL_MS || '90000', 10);
-setInterval(async () => {
-try {
-const state = gatherState(bot);
-const intent = await thinker(username, state);
-if (!intent) return;
-const approved = rules.validateIntent(username, state, intent);
-if (!approved.allowed) {
-bot.chat(`Action blocked by rules: ${approved.reason}`);
-return;
-}
-await executor.executeIntent(bot, intent, state);
-} catch (err) {
-console.error('Decision loop error', err);
-}
-}, interval);
-});
-
-
-bot.on('error', (err) => console.error('Bot error', err));
-bot.on('end', () => console.log(`${username} disconnected`));
+  bot.on('end', () => console.log(`❌ Bot disconnected (${name})`));
+  bot.on('error', (err) => console.error(`Bot error (${name}):`, err));
+  return bot;
 }
 
+async function startAILoop(bot, name) {
+  const interval = Number(process.env.DECISION_INTERVAL_MS) || 30000;
+  console.log(`🧠 AI loop started for ${name} (every ${interval} ms)`);
 
-function gatherState(bot) {
-// lightweight state for prompt. Keep it small to save tokens
-const inv = bot.inventory.items().map(i => ({name: i.name, count: i.count, id: i.type}));
-const pos = bot.entity.position;
-// try to find a nearby chest
-const chest = bot.findBlock({ matching: b => b.name === 'chest', maxDistance: 20 });
-return {
-inventory: inv,
-pos: pos ? {x: pos.x, y: pos.y, z: pos.z} : null,
-chestPos: chest ? {x: chest.position.x, y: chest.position.y, z: chest.position.z} : null
-};
+  // give world load time then start
+  setTimeout(() => {
+    setInterval(async () => {
+      try {
+        const state = {
+          inventory: bot.inventory.items().map(i => ({ name: i.name, count: i.count, type: i.type })),
+          pos: bot.entity && bot.entity.position ? { x: Math.floor(bot.entity.position.x), y: Math.floor(bot.entity.position.y), z: Math.floor(bot.entity.position.z) } : null
+        };
+
+        console.log(`=> Thinking for ${name} (pos: ${state.pos ? `${state.pos.x},${state.pos.y},${state.pos.z}` : 'unknown'})`);
+        const intent = await thinker(name, state);
+        console.log(`🧾 Intent for ${name}:`, intent);
+
+        if (intent) await executeAction(bot, intent);
+      } catch (err) {
+        console.error('AI loop error:', err);
+      }
+    }, interval);
+  }, 2000);
 }
-
 
 module.exports = { createBotInstance };

@@ -1,2 +1,17 @@
 .env
 node_modules
+server/world/
+server/world_nether/
+server/world_the_end/
+server/logs/
+server/cache/
+server/crash-reports/
+server/libraries/
+server/versions/
+server/paper.jar
+server/paper-*.jar
+*.log
+*.gz
+*.jar
+*.dat
+*.lock
