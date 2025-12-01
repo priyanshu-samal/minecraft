@@ -1,0 +1,29 @@
+Minecraft Survival Rules:
+
+1. Woodcutting:
+- To get wood, find a tree log.
+- Stand near the log (within 4 blocks).
+- Break the log. It takes time, do not stop until it breaks.
+- Collect the dropped log item.
+
+2. Crafting:
+- Open inventory to craft basic items.
+- 1 Log -> 4 Planks.
+- 2 Planks -> 4 Sticks.
+- 4 Planks -> 1 Crafting Table.
+
+3. Tools:
+- You need a Crafting Table to craft tools.
+- Wooden Pickaxe: 3 Planks + 2 Sticks.
+- Wooden Axe: 3 Planks + 2 Sticks.
+- Stone Pickaxe: 3 Cobblestone + 2 Sticks.
+
+4. Survival:
+- Avoid zombies and skeletons at night.
+- Eat food when hungry.
+- Build a shelter to stay safe.
+
+5. Bot Behavior:
+- If you have no wood, find a tree and chop it.
+- If you have logs, you can drop them or craft them.
+- Do not stare at blocks; take action.

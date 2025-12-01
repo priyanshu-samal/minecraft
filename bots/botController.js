@@ -35,9 +35,20 @@ async function startAILoop(bot, name) {
   setTimeout(() => {
     setInterval(async () => {
       try {
+        const nearbyLogs = bot.findBlocks({
+          matching: b => b && b.name && b.name.includes('log'),
+          maxDistance: 16,
+          count: 5
+        });
+        const nearbyBlocks = nearbyLogs.map(p => {
+          const b = bot.blockAt(p);
+          return { name: b.name, position: { x: b.position.x, y: b.position.y, z: b.position.z } };
+        });
+
         const state = {
           inventory: bot.inventory.items().map(i => ({ name: i.name, count: i.count, type: i.type })),
-          pos: bot.entity && bot.entity.position ? { x: Math.floor(bot.entity.position.x), y: Math.floor(bot.entity.position.y), z: Math.floor(bot.entity.position.z) } : null
+          pos: bot.entity && bot.entity.position ? { x: Math.floor(bot.entity.position.x), y: Math.floor(bot.entity.position.y), z: Math.floor(bot.entity.position.z) } : null,
+          nearbyBlocks: nearbyBlocks
         };
 
         console.log(`=> Thinking for ${name} (pos: ${state.pos ? `${state.pos.x},${state.pos.y},${state.pos.z}` : 'unknown'})`);

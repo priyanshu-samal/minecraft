@@ -1,34 +1,33 @@
-require("dotenv").config();
 const { Pinecone } = require("@pinecone-database/pinecone");
+const client = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+const index = client.index(process.env.PINECONE_INDEX);
 
-// CREATE CLIENT (v6 syntax)
-const pc = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY
-});
-
-// CONNECT INDEX
-const index = pc.index(process.env.PINECONE_INDEX);
-
-// ➤ STORE MEMORY
 async function storeMemory(id, vector, metadata) {
-  return index.upsert([
+  await index.upsert([
     {
       id,
       values: vector,
-      metadata
+      metadata: {
+        text: metadata.text || "",
+        x: metadata.x || 0,
+        y: metadata.y || 0,
+        z: metadata.z || 0,
+        type: metadata.type || "memory",
+        agent: metadata.agent || "unknown",
+        importance: metadata.importance || 1
+      }
     }
   ]);
+  console.log("🧠 Saved memory to Pinecone");
 }
 
-// ➤ QUERY MEMORY
 async function queryMemory(vector, topK = 5) {
-  const result = await index.query({
+  const res = await index.query({
     vector,
     topK,
     includeMetadata: true
   });
-
-  return result.matches || [];
+  return res.matches;
 }
 
 module.exports = { storeMemory, queryMemory };
