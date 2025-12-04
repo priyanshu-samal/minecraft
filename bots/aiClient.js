@@ -33,4 +33,4 @@ async function thinker(name, state) {
   }
 }
 
-module.exports = { thinker };
+module.exports = { thinker }
