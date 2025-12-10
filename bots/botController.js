@@ -13,12 +13,18 @@ function createBotInstance(name) {
   });
 
   bot.loadPlugin(pathfinder);
+  bot.loadPlugin(require('mineflayer-pvp').plugin);
 
   bot.once('spawn', () => {
     const mcData = mcDataLib(bot.version);
     bot.pathfinder.setMovements(new Movements(bot, mcData));
-    console.log(`🔥 ${name} is online at`, bot.entity.position);
-    bot.chat('Hello — I am alive.');
+    
+    // Assign Profession
+    const roles = ['Lumberjack', 'Guard'];
+    bot.profession = roles[Math.floor(Math.random() * roles.length)];
+    console.log(`🔥 ${name} is online at`, bot.entity.position, `Role: ${bot.profession}`);
+    
+    bot.chat(`Hello — I am a ${bot.profession}.`);
     startAILoop(bot, name);
   });
 
@@ -48,7 +54,8 @@ async function startAILoop(bot, name) {
         const state = {
           inventory: bot.inventory.items().map(i => ({ name: i.name, count: i.count, type: i.type })),
           pos: bot.entity && bot.entity.position ? { x: Math.floor(bot.entity.position.x), y: Math.floor(bot.entity.position.y), z: Math.floor(bot.entity.position.z) } : null,
-          nearbyBlocks: nearbyBlocks
+          nearbyBlocks: nearbyBlocks,
+          profession: bot.profession
         };
 
         console.log(`=> Thinking for ${name} (pos: ${state.pos ? `${state.pos.x},${state.pos.y},${state.pos.z}` : 'unknown'})`);

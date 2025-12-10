@@ -117,6 +117,27 @@ async function executeAction(bot, intent) {
     return;
   }
 
+  if (intent.action === 'attack') {
+    const entity = bot.nearestEntity(e => e.type === 'mob' && (e.name === 'zombie' || e.name === 'skeleton' || e.name === 'spider'));
+    if (entity) {
+      bot.chat(`Attacking ${entity.name}!`);
+      await bot.pvp.attack(entity);
+      await ingestEvent({ agent: bot.username, type: 'attack', text: `Attacked ${entity.name}`, coords: bot.entity.position, importance: 4 });
+    } else {
+      bot.chat('No enemies nearby.');
+    }
+    return;
+  }
+
+  if (intent.action === 'patrol') {
+    const range = 10;
+    const x = bot.entity.position.x + (Math.random() * range - range/2);
+    const z = bot.entity.position.z + (Math.random() * range - range/2);
+    bot.chat('Patrolling...');
+    await bot.pathfinder.goto(new GoalNear(x, bot.entity.position.y, z, 1));
+    return;
+  }
+
   bot.chat('Idle.');
 }
 

@@ -17,6 +17,7 @@ const AgentState = Annotation.Root({
   rules: Annotation,
   plan: Annotation,
   lastAction: Annotation,
+  profession: Annotation,
 });
 
 // --- Nodes ---
@@ -34,7 +35,12 @@ async function retrieve_rules(state) {
 async function planner(state) {
   const prompt = `
 You are a Minecraft agent named ${state.name}.
-Your goal is to survive and thrive.
+Your Profession: ${state.profession || 'Villager'}
+
+Your Goal:
+- If Lumberjack: Gather wood, replant saplings.
+- If Guard: Patrol nearby, attack zombies/skeletons.
+- If Villager: Survive and explore.
 
 Context (Rules & Memories):
 ${state.rules.join('\n')}
@@ -53,6 +59,8 @@ Rules:
 Available actions:
 - {"action": "collect", "target": {"x":..., "y":..., "z":...}} (to chop wood)
 - {"action": "drop"} (if inventory full of logs)
+- {"action": "attack"} (if Guard and enemy nearby)
+- {"action": "patrol"} (if Guard and no enemy)
 - {"action": "idle"}
 
 Return ONLY the JSON object for the action.
