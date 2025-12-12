@@ -1,6 +1,7 @@
 const { goals: { GoalNear } } = require('mineflayer-pathfinder');
 const { Vec3 } = require('vec3');
 const { ingestEvent } = require('./rag/memoryManager');
+const { recordContribution } = require('./economyManager');
 
 /* safe chop and deposit executor */
 
@@ -55,6 +56,7 @@ async function depositToChest(bot) {
       if (item.name.includes('log') || item.name.includes('plank')) {
         total += item.count;
         await chest.deposit(item.type, null, item.count).catch(()=>{});
+        recordContribution(bot.username, item.name, item.count);
       }
     }
     chest.close();

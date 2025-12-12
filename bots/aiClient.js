@@ -18,6 +18,7 @@ async function thinker(name, state) {
     position: state.pos,
     nearbyBlocks: state.nearbyBlocks || [],
     profession: state.profession || 'Villager',
+    score: state.score || 0,
     memory: [], // Populated by graph
     rules: [], // Populated by graph
     plan: null,

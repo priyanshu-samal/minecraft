@@ -18,6 +18,7 @@ const AgentState = Annotation.Root({
   plan: Annotation,
   lastAction: Annotation,
   profession: Annotation,
+  score: Annotation,
 });
 
 // --- Nodes ---
@@ -41,6 +42,9 @@ Your Goal:
 - If Lumberjack: Gather wood, replant saplings.
 - If Guard: Patrol nearby, attack zombies/skeletons.
 - If Villager: Survive and explore.
+
+Your Score (Social Credit): ${state.score || 0}
+(Earn score by depositing resources!)
 
 Context (Rules & Memories):
 ${state.rules.join('\n')}

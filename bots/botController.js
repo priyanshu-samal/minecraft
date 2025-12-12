@@ -4,6 +4,7 @@ const { pathfinder, Movements } = require('mineflayer-pathfinder');
 const mcDataLib = require('minecraft-data');
 const { thinker } = require('./aiClient');
 const { executeAction } = require('./executor');
+const { getBalance } = require('./economyManager');
 
 function createBotInstance(name) {
   const bot = mineflayer.createBot({
@@ -55,7 +56,8 @@ async function startAILoop(bot, name) {
           inventory: bot.inventory.items().map(i => ({ name: i.name, count: i.count, type: i.type })),
           pos: bot.entity && bot.entity.position ? { x: Math.floor(bot.entity.position.x), y: Math.floor(bot.entity.position.y), z: Math.floor(bot.entity.position.z) } : null,
           nearbyBlocks: nearbyBlocks,
-          profession: bot.profession
+          profession: bot.profession,
+          score: getBalance(name)
         };
 
         console.log(`=> Thinking for ${name} (pos: ${state.pos ? `${state.pos.x},${state.pos.y},${state.pos.z}` : 'unknown'})`);
