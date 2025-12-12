@@ -44,7 +44,7 @@ Your Goal:
 - If Villager: Survive and explore.
 
 Your Score (Social Credit): ${state.score || 0}
-(Earn score by depositing resources!)
+(Earn score by depositing resources! Cost to Reproduce: 50)
 
 Context (Rules & Memories):
 ${state.rules.join('\n')}
@@ -58,13 +58,15 @@ Decide on the next best action.
 Rules:
 1. If you see a log in "Nearby Blocks" and you don't have many logs, collect it.
 2. If inventory is full of logs (>= 10), drop them.
-3. Otherwise, idle or explore.
+3. If your score is > 50, you should REPRODUCE to expand the clan.
+4. Otherwise, idle or explore.
 
 Available actions:
 - {"action": "collect", "target": {"x":..., "y":..., "z":...}} (to chop wood)
 - {"action": "drop"} (if inventory full of logs)
 - {"action": "attack"} (if Guard and enemy nearby)
 - {"action": "patrol"} (if Guard and no enemy)
+- {"action": "reproduce"} (if score > 50)
 - {"action": "idle"}
 
 Return ONLY the JSON object for the action.

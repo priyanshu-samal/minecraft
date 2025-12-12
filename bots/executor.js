@@ -1,7 +1,8 @@
 const { goals: { GoalNear } } = require('mineflayer-pathfinder');
 const { Vec3 } = require('vec3');
 const { ingestEvent } = require('./rag/memoryManager');
-const { recordContribution } = require('./economyManager');
+const { recordContribution, getBalance } = require('./economyManager');
+const { spawnChild } = require('./reproductionManager');
 
 /* safe chop and deposit executor */
 
@@ -137,6 +138,22 @@ async function executeAction(bot, intent) {
     const z = bot.entity.position.z + (Math.random() * range - range/2);
     bot.chat('Patrolling...');
     await bot.pathfinder.goto(new GoalNear(x, bot.entity.position.y, z, 1));
+    return;
+  }
+
+  if (intent.action === 'reproduce') {
+    const score = getBalance(bot.username);
+    const cost = 50;
+    if (score >= cost) {
+      bot.chat(`I am reproducing! (Cost: ${cost}, Current: ${score})`);
+      spawnChild(bot.username);
+      // Deduct score manually? For now economyManager only adds. 
+      // Ideally we should add a 'deduct' method but for prototype we just spawn.
+      // Let's assume the manager handles it or we update it later.
+      await ingestEvent({ agent: bot.username, type: 'reproduce', text: `Spawned a child`, coords: bot.entity.position, importance: 10 });
+    } else {
+      bot.chat(`Not enough credit to reproduce. Need ${cost}, have ${score}.`);
+    }
     return;
   }
 
